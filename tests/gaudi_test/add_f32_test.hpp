@@ -26,7 +26,9 @@ class AddF32Test : public TestBase
 public:
     AddF32Test() {}
     ~AddF32Test() {}
-    int runTest();
+    int runTest(); // runs whole test end-to-end
+    std::vector<float_5DTensor> prepareTestInputs(); // TODO sending this over to all processes would require sending data, then shape, then recreating the tensors.......
+    std::vector<float> Compute(/*std::vector<std::vector<float>> inputs,*/ int seed, Gaudi_Kernel_Name_e NameofKernel = GAUDI_KERNEL_MAX_EXAMPLE_KERNEL);
 
     inline static void addf32_reference_implementation(
             const float_5DTensor& input0,

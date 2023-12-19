@@ -88,7 +88,7 @@ int AddF32Test::runTest()
     for (unsigned i = 0; i < kernelCount; i++)
     {
         kernelNames[i] = new char[gcapi::MAX_NODE_NAME];
-    }    
+    }
     result = GetKernelNames(kernelNames, &kernelCount, gcapi::DEVICE_ID_GAUDI);
     if (result != gcapi::GLUE_SUCCESS)
     {
@@ -128,3 +128,87 @@ int AddF32Test::runTest()
     return 0;
 }
 
+std::vector<float_5DTensor> AddF32Test::prepareTestInputs() {
+    // const int height = 5;
+    // const int width  = 5;
+    // const int depth  = 100;
+    // const int batch  = 1;
+    // const int rank4  = 2;
+
+    // unsigned int fmInitializer[] = {depth, width, height, batch, rank4};
+
+    std::vector<float_5DTensor> res;
+
+    // auto& input0 = res.emplace_back(fmInitializer);
+    // input0.InitRand(-10.0f, 10.0f);
+
+    // auto& input1 = res.emplace_back(fmInitializer);
+    // input1.InitRand(-10.0f, 10.0f);
+
+    return res;
+}
+
+std::vector<float> AddF32Test::Compute(/*std::vector<float_5DTensor> inputs,*/ int seed, Gaudi_Kernel_Name_e)
+{
+    const int height = 5;
+    const int width  = 5;
+    const int depth  = 100;
+    const int batch  = 1;
+    const int rank4  = 2;
+
+    unsigned int fmInitializer[] = {depth, width, height, batch, rank4};
+
+    float_5DTensor input0(fmInitializer);
+    input0.InitRand(-10.0f, 10.0f, seed);
+
+    float_5DTensor input1(fmInitializer);
+    input1.InitRand(-10.0f, 10.0f, seed);
+
+    float_5DTensor output(fmInitializer);
+
+    // generate input for query call
+    m_in_defs.deviceId = gcapi::DEVICE_ID_GAUDI;
+
+    m_in_defs.inputTensorNr = 2;
+    LoadTensorToGcDescriptor(&(m_in_defs.inputTensors[0]), input0);
+    LoadTensorToGcDescriptor(&(m_in_defs.inputTensors[1]), input1);
+
+    m_in_defs.outputTensorNr = 1;
+    LoadTensorToGcDescriptor(&(m_in_defs.outputTensors[0]), output);
+
+    char**   kernelNames = nullptr;
+    unsigned kernelCount = 0;
+    gcapi::GlueCodeReturn_t result = GetKernelNames(kernelNames, &kernelCount, gcapi::DEVICE_ID_GAUDI);
+    kernelNames = new char*[kernelCount];
+    for (unsigned i = 0; i < kernelCount; i++)
+    {
+        kernelNames[i] = new char[gcapi::MAX_NODE_NAME];
+    }
+    result = GetKernelNames(kernelNames, &kernelCount, gcapi::DEVICE_ID_GAUDI);
+    if (result != gcapi::GLUE_SUCCESS)
+    {
+        std::cout << "Can't get kernel name!! " << result << std::endl;
+        ReleaseKernelNames(kernelNames, kernelCount);
+        return {};
+    }
+
+    strcpy(m_in_defs.nodeName, kernelNames[GAUDI_KERNEL_ADD_F32]);
+    result  = HabanaKernel(&m_in_defs,&m_out_defs);
+    if (result != gcapi::GLUE_SUCCESS)
+    {
+        std::cout << "Glue test failed, can't load kernel " << result << std::endl;
+        ReleaseKernelNames(kernelNames, kernelCount);
+        return {};
+    }
+
+    // generate and load tensor descriptors
+    std::vector<TensorDesc> vec;
+    vec.push_back(input0.GetTensorDescriptor());
+    vec.push_back(input1.GetTensorDescriptor());
+    vec.push_back(output.GetTensorDescriptor());
+    // execute a simulation of the kernel using TPC simulator,
+    TestBase::RunSimulation(vec, m_in_defs, m_out_defs);
+    ReleaseKernelNames(kernelNames, kernelCount);
+
+    return std::vector<float>(output.Data(), output.Data() + output.ElementCount());
+}

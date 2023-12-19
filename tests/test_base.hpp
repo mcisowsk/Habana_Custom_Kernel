@@ -20,13 +20,15 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 #include <memory>
 
 #include "tensor.h"
+#include "entry_points.hpp"
+
 #include "gc_interface.h"
 
 class TestBase
 {
 public:
     TestBase() {}
-    ~TestBase() {}
+    virtual ~TestBase() {}
     static const int c_default_isa_buffer_size = 1024 * 1024;
 
     typedef enum _IndexSpaceMappingTest_t
@@ -44,7 +46,7 @@ public:
                                 IndexSpaceMappingTest_t testMode = e_defaultMode);
 
     virtual void SetUp();
-
+    virtual std::vector<float> Compute(int seed, Gaudi_Kernel_Name_e NameofKernel = GAUDI_KERNEL_MAX_EXAMPLE_KERNEL);
     virtual void TearDown();
 
     template <class T, int DIM>
@@ -59,7 +61,7 @@ public:
         }
     }
 
-       
+
     void ReleaseKernelNames(char** kernelNames, unsigned kernelCount)
     {
         // release memory
@@ -68,7 +70,7 @@ public:
             delete[] kernelNames[i];
         }
         delete[] kernelNames;
-    }    
+    }
 
     gcapi::HabanaKernelParams_t         m_in_defs;
     gcapi::HabanaKernelInstantiation_t  m_out_defs;

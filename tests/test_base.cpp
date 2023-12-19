@@ -39,6 +39,12 @@ void TestBase::TearDown()
     m_out_defs.elfSize = 0;
 }
 
+std::vector<float> TestBase::Compute(int seed, Gaudi_Kernel_Name_e NameofKernel)
+{
+   // XXX we should not enter here?
+   throw std::runtime_error("TestBase::Compute() unimplemented");
+}
+
 unsigned int TestBase::RunSimulation(   std::vector<TensorDesc>& descriptors,
                                         const gcapi::HabanaKernelParams_t& gc_input,
                                         const gcapi::HabanaKernelInstantiation_t& gc_output,
@@ -47,7 +53,7 @@ unsigned int TestBase::RunSimulation(   std::vector<TensorDesc>& descriptors,
    unsigned  retVal= 0;
    //debug prints of glue code input and output.
    PrintKernelInputParams(&gc_input);
-   PrintKernelOutputParams(&gc_input,&gc_output);    
+   PrintKernelOutputParams(&gc_input,&gc_output);
 
    retVal = tpc_tests::RunSimulation(gc_input, gc_output, descriptors);
    const char* env = getenv("TPC_RUNNER");

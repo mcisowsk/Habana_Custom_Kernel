@@ -28,17 +28,18 @@ public:
     Relu6AllTest() {}
     ~Relu6AllTest() {}
     int runTest(Gaudi_Kernel_Name_e NameofKernel);
+    std::vector<float> Compute(int seed, Gaudi_Kernel_Name_e NameofKernel = GAUDI_KERNEL_MAX_EXAMPLE_KERNEL);
 
     static void relu6_f32_reference_implementation(
-            const float_5DTensor& gradin,  
+            const float_5DTensor& gradin,
             const float_5DTensor& input,
             float_5DTensor& output, Gaudi_Kernel_Name_e mode);
 
     static void relu6_bf16_reference_implementation(
-            const bfloat16_5DTensor& gradin,        
+            const bfloat16_5DTensor& gradin,
             const bfloat16_5DTensor& input,
             bfloat16_5DTensor& output, Gaudi_Kernel_Name_e mode);
-            
+
 private:
     Relu6AllTest(const Relu6AllTest& other) = delete;
     Relu6AllTest& operator=(const Relu6AllTest& other) = delete;

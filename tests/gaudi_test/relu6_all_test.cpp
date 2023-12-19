@@ -17,7 +17,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 #include "relu6_all_test.hpp"
 
 void Relu6AllTest::relu6_f32_reference_implementation(
-        const float_5DTensor& gradin,    
+        const float_5DTensor& gradin,
         const float_5DTensor& input,
         float_5DTensor& output, Gaudi_Kernel_Name_e mode)
 {
@@ -163,7 +163,7 @@ int Relu6AllTest::runTest(Gaudi_Kernel_Name_e NameofKernel)
       || (NameofKernel == GAUDI_KERNEL_RELU_FWD_F32) || (NameofKernel == GAUDI_KERNEL_RELU_BWD_F32))
     {
         float_5DTensor gradin(fmInitializer);
-        gradin.InitRand(-10.0f, 10.0f);    
+        gradin.InitRand(-10.0f, 10.0f);
         float_5DTensor input(fmInitializer);
         input.InitRand(-10.0f, 10.0f);
         float_5DTensor output(fmInitializer);
@@ -197,7 +197,7 @@ int Relu6AllTest::runTest(Gaudi_Kernel_Name_e NameofKernel)
         for (unsigned i = 0; i < kernelCount; i++)
         {
             kernelNames[i] = new char[gcapi::MAX_NODE_NAME];
-        }    
+        }
         result = GetKernelNames(kernelNames, &kernelCount, gcapi::DEVICE_ID_GAUDI);
         if (result != gcapi::GLUE_SUCCESS)
         {
@@ -255,7 +255,7 @@ int Relu6AllTest::runTest(Gaudi_Kernel_Name_e NameofKernel)
            || (NameofKernel == GAUDI_KERNEL_RELU_FWD_BF16) || (NameofKernel == GAUDI_KERNEL_RELU_BWD_BF16))
     {
         bfloat16_5DTensor gradin(fmInitializer);
-        gradin.InitRand(-10.0f, 10.0f);    
+        gradin.InitRand(-10.0f, 10.0f);
         bfloat16_5DTensor input(fmInitializer);
         input.InitRand(-10.0f, 10.0f);
         bfloat16_5DTensor output(fmInitializer);
@@ -287,7 +287,7 @@ int Relu6AllTest::runTest(Gaudi_Kernel_Name_e NameofKernel)
         for (unsigned i = 0; i < kernelCount; i++)
         {
             kernelNames[i] = new char[gcapi::MAX_NODE_NAME];
-        }    
+        }
         result = GetKernelNames(kernelNames, &kernelCount, gcapi::DEVICE_ID_GAUDI);
         if (result != gcapi::GLUE_SUCCESS)
         {
@@ -346,3 +346,145 @@ int Relu6AllTest::runTest(Gaudi_Kernel_Name_e NameofKernel)
     return 0;
 }
 
+
+std::vector<float> Relu6AllTest::Compute(int seed, Gaudi_Kernel_Name_e NameofKernel) {
+    const int height = 5;
+    const int width  = 5;
+    const int depth  = 100;
+    const int batch  = 2;
+    const int fifthdim  = 1;
+
+    unsigned int fmInitializer[] = {depth, width, height, batch, fifthdim};
+    unsigned kernelCount;
+    gcapi::GlueCodeReturn_t result;
+    char**   kernelNames = nullptr;
+
+    if((NameofKernel == GAUDI_KERNEL_RELU6_FWD_F32) || (NameofKernel == GAUDI_KERNEL_RELU6_BWD_F32)
+      || (NameofKernel == GAUDI_KERNEL_RELU_FWD_F32) || (NameofKernel == GAUDI_KERNEL_RELU_BWD_F32))
+    {
+        float_5DTensor gradin(fmInitializer);
+        gradin.InitRand(-10.0f, 10.0f, seed);
+        float_5DTensor input(fmInitializer);
+        input.InitRand(-10.0f, 10.0f, seed);
+        float_5DTensor output(fmInitializer);
+
+        // generate input for query call
+        m_in_defs.deviceId = gcapi::DEVICE_ID_GAUDI;
+
+        if(NameofKernel == GAUDI_KERNEL_RELU6_FWD_F32 || NameofKernel == GAUDI_KERNEL_RELU_FWD_F32)
+        {
+            // execute reference implementation of the kernel.
+            m_in_defs.inputTensorNr = 1;
+            LoadTensorToGcDescriptor(&(m_in_defs.inputTensors[0]), input);
+        }
+        else
+        {
+            // execute reference implementation of the kernel.
+            m_in_defs.inputTensorNr = 2;
+            LoadTensorToGcDescriptor(&(m_in_defs.inputTensors[0]), gradin);
+            LoadTensorToGcDescriptor(&(m_in_defs.inputTensors[1]), input);
+        }
+
+        m_in_defs.outputTensorNr = 1;
+        LoadTensorToGcDescriptor(&(m_in_defs.outputTensors[0]), output);
+
+        kernelCount = 0;
+        result = GetKernelNames(kernelNames, &kernelCount, gcapi::DEVICE_ID_GAUDI);
+        kernelNames = new char*[kernelCount];
+        for (unsigned i = 0; i < kernelCount; i++)
+        {
+            kernelNames[i] = new char[gcapi::MAX_NODE_NAME];
+        }
+        result = GetKernelNames(kernelNames, &kernelCount, gcapi::DEVICE_ID_GAUDI);
+        if (result != gcapi::GLUE_SUCCESS)
+        {
+            std::cout << "Can't get kernel name!! " << result << std::endl;
+            ReleaseKernelNames(kernelNames, kernelCount);
+            return {};
+        }
+
+        strcpy(m_in_defs.nodeName, kernelNames[NameofKernel]);
+        result  = HabanaKernel(&m_in_defs,&m_out_defs);
+        if (result != gcapi::GLUE_SUCCESS)
+        {
+            std::cout << "Glue test failed, can't load kernel " << result << std::endl;
+            ReleaseKernelNames(kernelNames, kernelCount);
+            return {};
+        }
+
+        // generate and load tensor descriptors
+        std::vector<TensorDesc> vec;
+        if(NameofKernel == GAUDI_KERNEL_RELU6_BWD_F32 || NameofKernel == GAUDI_KERNEL_RELU_BWD_F32)
+            vec.push_back(gradin.GetTensorDescriptor());
+        vec.push_back(input.GetTensorDescriptor());
+        vec.push_back(output.GetTensorDescriptor());
+        // execute a simulation of the kernel using TPC simulator,
+        TestBase::RunSimulation(vec, m_in_defs, m_out_defs);
+        ReleaseKernelNames(kernelNames, kernelCount);
+        return std::vector<float>(output.Data(), output.Data() + output.ElementCount());
+    }
+    else if ((NameofKernel == GAUDI_KERNEL_RELU6_FWD_BF16) || (NameofKernel == GAUDI_KERNEL_RELU6_BWD_BF16)
+           || (NameofKernel == GAUDI_KERNEL_RELU_FWD_BF16) || (NameofKernel == GAUDI_KERNEL_RELU_BWD_BF16))
+    {
+        bfloat16_5DTensor gradin(fmInitializer);
+        gradin.InitRand(-10.0f, 10.0f, seed);
+        bfloat16_5DTensor input(fmInitializer);
+        input.InitRand(-10.0f, 10.0f, seed);
+        bfloat16_5DTensor output(fmInitializer);
+
+        // generate input for query call
+        m_in_defs.deviceId = gcapi::DEVICE_ID_GAUDI;
+
+        if(NameofKernel == GAUDI_KERNEL_RELU6_FWD_BF16 || NameofKernel == GAUDI_KERNEL_RELU_FWD_BF16)
+        {
+            m_in_defs.inputTensorNr = 1;
+            LoadTensorToGcDescriptor(&(m_in_defs.inputTensors[0]), input);
+        }
+        else
+        {
+            m_in_defs.inputTensorNr = 2;
+            LoadTensorToGcDescriptor(&(m_in_defs.inputTensors[0]), gradin);
+            LoadTensorToGcDescriptor(&(m_in_defs.inputTensors[1]), input);
+        }
+
+        m_in_defs.outputTensorNr = 1;
+        LoadTensorToGcDescriptor(&(m_in_defs.outputTensors[0]), output);
+
+        kernelCount = 0;
+        result = GetKernelNames(kernelNames, &kernelCount, gcapi::DEVICE_ID_GAUDI);
+        kernelNames = new char*[kernelCount];
+        for (unsigned i = 0; i < kernelCount; i++)
+        {
+            kernelNames[i] = new char[gcapi::MAX_NODE_NAME];
+        }
+        result = GetKernelNames(kernelNames, &kernelCount, gcapi::DEVICE_ID_GAUDI);
+        if (result != gcapi::GLUE_SUCCESS)
+        {
+            std::cout << "Can't get kernel name!! " << result << std::endl;
+            ReleaseKernelNames(kernelNames, kernelCount);
+            return {};
+        }
+
+        strcpy(m_in_defs.nodeName, kernelNames[NameofKernel]);
+        result  = HabanaKernel(&m_in_defs,&m_out_defs);
+        if (result != gcapi::GLUE_SUCCESS)
+        {
+            std::cout << "Glue test failed, can't load kernel " << result << std::endl;
+            ReleaseKernelNames(kernelNames, kernelCount);
+            return {};
+        }
+
+        // generate and load tensor descriptors
+        std::vector<TensorDesc> vec;
+        if(NameofKernel == GAUDI_KERNEL_RELU6_BWD_BF16 || NameofKernel == GAUDI_KERNEL_RELU_BWD_BF16)
+            vec.push_back(gradin.GetTensorDescriptor());
+        vec.push_back(input.GetTensorDescriptor());
+        vec.push_back(output.GetTensorDescriptor());
+        // execute a simulation of the kernel using TPC simulator,
+        TestBase::RunSimulation(vec, m_in_defs, m_out_defs);
+        ReleaseKernelNames(kernelNames, kernelCount);
+        output.Print(0);
+        return std::vector<float>(output.Data(), output.Data() + output.ElementCount());
+    }
+    return {};
+}
