@@ -31,7 +31,7 @@ tests_incdirs = include_directories(
     '/usr/lib/habanatools/include',
 )
 
-run_command('../kernels/build.sh', meson.project_build_root(), check: true)
+run_command('../kernels/build.sh', meson.project_build_root(), meson.current_source_dir(), check: true)
 
 kernels = [
     cpp.find_library('add_f32', dirs: [meson.project_build_root() + '/src']),
@@ -75,9 +75,6 @@ custom_tpc_perf_lib = shared_library(
     'custom_tpc_perf_lib',
     src_cpp_files,
     dependencies : [
-        tpc_test_core_library,
-        tpcsim_shared_library,
-        tpc_elf_reader_library,
         kernels,
     ],
     build_by_default: true,

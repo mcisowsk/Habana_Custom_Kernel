@@ -1,9 +1,10 @@
 #!/bin/bash
 set -x
 
+mkdir -p "${1}/src"
 pushd "${1}/src"
 
-cmake ../../kernels
+cmake "${2}/../kernels"
 make
 
 popd
