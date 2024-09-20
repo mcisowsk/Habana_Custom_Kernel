@@ -14,6 +14,7 @@ OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY TH
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ********************************************************************/
 
+//#include "gaudi2_src/reinterpret_fwd_i32.hpp"
 #include "printf_test.hpp"
 #include "batch_norm_f32.hpp"
 #include "cast_gaudi.hpp"
@@ -37,6 +38,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 #include "add_f32_gaudi2.hpp"
 #include "relu_all_gaudi2.hpp"
 #include "user_lut_gaudi2.hpp"
+#include "reinterpret_fwd_i32.hpp"
 
 #include "entry_points.hpp"
 #include <stdio.h>
@@ -118,8 +120,8 @@ tpc_lib_api::GlueCodeReturn GetKernelGuids( _IN_    tpc_lib_api::DeviceId       
     {
         if (guids != nullptr )
         {
-           KLDivAll KLDivFwdF32Instance2(KLDivAll::fwd_f32_gaudi2); 
-           KLDivFwdF32Instance2.GetKernelName(guids[GAUDI2_KERNEL_KL_DIV_FWD_F32].name);            
+           KLDivAll KLDivFwdF32Instance2(KLDivAll::fwd_f32_gaudi2);
+           KLDivFwdF32Instance2.GetKernelName(guids[GAUDI2_KERNEL_KL_DIV_FWD_F32].name);
            AvgPool2dF32Gaudi2 avgpool2dfwdf32g2Instance(AvgPool2dF32Gaudi2::fwd);
            avgpool2dfwdf32g2Instance.GetKernelName(guids[GAUDI2_KERNEL_AVG_POOL_2D_FWD_F32].name);
            AvgPool2dF32Gaudi2 avgpool2dbwdf32g2Instance(AvgPool2dF32Gaudi2::bwd);
@@ -129,6 +131,8 @@ tpc_lib_api::GlueCodeReturn GetKernelGuids( _IN_    tpc_lib_api::DeviceId       
            SoftMaxBF16Gaudi2 softmaxInstance;
            softmaxInstance.GetKernelNameFcd(guids[GAUDI2_KERNEL_SOFTMAX_FCD_BF16].name);
            softmaxInstance.GetKernelNameNonFcd(guids[GAUDI2_KERNEL_SOFTMAX_NONFCD_BF16].name);
+           ReinterpretFwdI32 reinterpretInstace;
+           reinterpretInstace.GetKernelName(guids[GAUDI2_KERNEL_REINTERPRET_FWD_I32].name);
            AddF32Gaudi2 addf32g2Instance;
            addf32g2Instance.GetKernelName(guids[GAUDI2_KERNEL_ADD_F32].name);
            ReluAllGaudi2 ReluFwdF32g2Instance(ReluAllGaudi2::relu_fwd_f32);
@@ -333,7 +337,7 @@ InstantiateTpcKernel(_IN_  tpc_lib_api::HabanaKernelParams* params,
     {
         return searchsortedfwdf32Instance.GetGcDefinitions(params, instance);
     }
-    
+
     GatherFwdI32 gatherfwddim0i32Instance(GatherFwdI32::gather_fwd_dim0);
     gatherfwddim0i32Instance.GetKernelName(kernelName);
     if (strcmp(params->guid.name, kernelName) == 0)
@@ -361,14 +365,14 @@ InstantiateTpcKernel(_IN_  tpc_lib_api::HabanaKernelParams* params,
     {
         return KLDivBwdF32Instance.GetGcDefinitions(params,instance);
     }
-    /////// --- Gaudi2 
+    /////// --- Gaudi2
     ///////////////////////////////
     KLDivAll KLDivFwdF32Instance2(KLDivAll::fwd_f32_gaudi2);
     KLDivFwdF32Instance2.GetKernelName(kernelName);
     if (strcmp(params->guid.name, kernelName) == 0)
     {
         return KLDivFwdF32Instance2.GetGcDefinitions(params,instance);
-    }    
+    }
     AvgPool2dF32Gaudi2 avgpool2dfwdf32g2Instance(AvgPool2dF32Gaudi2::fwd);
     avgpool2dfwdf32g2Instance.GetKernelName(kernelName);
     if (strcmp(params->guid.name, kernelName) == 0)
@@ -439,6 +443,13 @@ InstantiateTpcKernel(_IN_  tpc_lib_api::HabanaKernelParams* params,
     if (strcmp(params->guid.name, kernelName) == 0)
     {
         return userLutInstance.GetGcDefinitions(params,instance);
+    }
+
+    ReinterpretFwdI32 reinterpretInstance;
+    reinterpretInstance.GetKernelName(kernelName);
+    if (strcmp(params->guid.name, kernelName) == 0)
+    {
+        return reinterpretInstance.GetGcDefinitions(params, instance);
     }
 
     return tpc_lib_api::GLUE_NODE_NOT_FOUND;

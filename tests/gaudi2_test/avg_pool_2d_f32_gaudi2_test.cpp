@@ -141,9 +141,9 @@ void AvgPool2DF32Gaudi2Test::avg_pool_2d_get_intospacePixelsInArea(
 
                         for (int kw = 0; kw < def.srdef.kernel_w; kw++)
                         {
-                           
+
                             outCoord.w = (in_coord.w * def.srdef.stride_w) + (kw * def.srdef.dilation_w) -
-                                         def.srdef.pad_w;                
+                                         def.srdef.pad_w;
                             bool intospace = ((outCoord.w >= 0 && outCoord.w < (int)ifm.Size(1)) &&
                                     (outCoord.h >= 0 && outCoord.h < (int)ifm.Size(2)));
                             if (intospace)
@@ -218,7 +218,7 @@ void AvgPool2DF32Gaudi2Test::avg_pool_2d_bwd_reference_implementation(
 
                         for (int kw = 0; kw < def.srdef.kernel_w; kw++)
                         {
-                           
+
                             outCoord.w = (in_coord.w * def.srdef.stride_w) + (kw * def.srdef.dilation_w) -
                                          def.srdef.pad_w;
 
@@ -227,7 +227,7 @@ void AvgPool2DF32Gaudi2Test::avg_pool_2d_bwd_reference_implementation(
 
                             accum = ofm.ElementAt((int*)&outCoord);
                             accum += out;
-                            ofm.SetElement((int*)&outCoord, accum);                        
+                            ofm.SetElement((int*)&outCoord, accum);
                         }
                     }
                 }
@@ -286,7 +286,7 @@ int AvgPool2DF32Gaudi2Test::runTest(Gaudi2_Kernel_Name_e NameofKernel)
     }
 
     uint64_t ofmInitializer[] = {ifm_depth, (unsigned int)ofm_width, (unsigned int)ofm_height, ifm_batch};
-    
+
     float_4DTensor ofm(ofmInitializer);
     float_4DTensor ofm_ref(ofmInitializer);
 
@@ -329,9 +329,9 @@ int AvgPool2DF32Gaudi2Test::runTest(Gaudi2_Kernel_Name_e NameofKernel)
     tpc_lib_api::GuidInfo *guids = nullptr;
     unsigned kernelCount = 0;
     tpc_lib_api::GlueCodeReturn result = GetKernelGuids(tpc_lib_api::DEVICE_ID_GAUDI2, &kernelCount, guids);
-    guids = new tpc_lib_api::GuidInfo[kernelCount];    
+    guids = new tpc_lib_api::GuidInfo[kernelCount];
     result = GetKernelGuids(tpc_lib_api::DEVICE_ID_GAUDI2, &kernelCount, guids);
-    
+
     if (result != tpc_lib_api::GLUE_SUCCESS)
     {
         std::cout << "Can't get kernel name!! " << result << std::endl;
@@ -362,7 +362,7 @@ int AvgPool2DF32Gaudi2Test::runTest(Gaudi2_Kernel_Name_e NameofKernel)
         aux_tensor.Init(m_out_defs.auxiliaryTensors[0].geometry.maxSizes,
                                     (float*)m_out_defs.auxiliaryTensors[0].pData);
     }
-    
+
 
     if (result != tpc_lib_api::GLUE_SUCCESS)
     {
@@ -377,7 +377,7 @@ int AvgPool2DF32Gaudi2Test::runTest(Gaudi2_Kernel_Name_e NameofKernel)
     vec.push_back(validCountfm.GetTensorDescriptor());
     vec.push_back(ofm.GetTensorDescriptor());
     vec.push_back(aux_tensor.GetTensorDescriptor());
-    
+
     // execute a simulation of the kernel using TPC simulator,
     TestBase::RunSimulation(vec, m_in_defs, m_out_defs);
     ReleaseKernelNames(guids, kernelCount);
@@ -392,7 +392,7 @@ int AvgPool2DF32Gaudi2Test::runTest(Gaudi2_Kernel_Name_e NameofKernel)
     {
         delete [] (int8_t*)m_out_defs.auxiliaryTensors[0].pData;
         m_out_defs.auxiliaryTensors[0].pData = NULL;
-    }    
+    }
     for (int element = 0 ; element <  ofm_ref.ElementCount() ; element++)
     {
         if (abs(ofm.Data()[element] - ofm_ref.Data()[element]) > 1e-6)

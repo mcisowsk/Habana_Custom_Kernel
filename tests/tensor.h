@@ -257,6 +257,14 @@ public:
         }
     }
 
+    void FillWithValueFloat(float val = 0)
+    {
+        for (int i = 0 ; i < m_element_count; i++)
+        {
+            m_pdata[i] = val;
+        }
+    }
+
     void FillWithSortedValue(bool isSeq = 1)
     {
         if(isSeq) {
@@ -265,20 +273,20 @@ public:
             m_pdata[2] = 4.0; m_pdata[5] = 8.0; m_pdata[8] = 12.0; m_pdata[11] = 15.0; m_pdata[14] = 20.0;
         }
         else{
-            m_pdata[0] = 3.0; m_pdata[3] = 6.0; m_pdata[6] = 9.0; 
-            m_pdata[1] = 3.0; m_pdata[4] = 6.0; m_pdata[7] = 9.0; 
-            m_pdata[2] = 12.0; m_pdata[5] = 13.0; m_pdata[8] = 14.0; 
+            m_pdata[0] = 3.0; m_pdata[3] = 6.0; m_pdata[6] = 9.0;
+            m_pdata[1] = 3.0; m_pdata[4] = 6.0; m_pdata[7] = 9.0;
+            m_pdata[2] = 12.0; m_pdata[5] = 13.0; m_pdata[8] = 14.0;
 
         }
     }
-        
+
     void FillWithSpecificData(int type)
     {
         if(type == GATHER_INDEX) {
-            m_pdata[0] = 0; m_pdata[1] = 1; m_pdata[2] = 2; m_pdata[3] = 3; 
-            m_pdata[4] = 3; m_pdata[5] = 2; m_pdata[6] = 1; m_pdata[7] = 0; 
-            m_pdata[8] = 2; m_pdata[9] = 3; m_pdata[10] = 0; m_pdata[11] = 1; 
-            m_pdata[12] = 1; m_pdata[13] = 2; m_pdata[14] = 1; m_pdata[15] = 0; 
+            m_pdata[0] = 0; m_pdata[1] = 1; m_pdata[2] = 2; m_pdata[3] = 3;
+            m_pdata[4] = 3; m_pdata[5] = 2; m_pdata[6] = 1; m_pdata[7] = 0;
+            m_pdata[8] = 2; m_pdata[9] = 3; m_pdata[10] = 0; m_pdata[11] = 1;
+            m_pdata[12] = 1; m_pdata[13] = 2; m_pdata[14] = 1; m_pdata[15] = 0;
         }
 
     }

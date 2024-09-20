@@ -73,9 +73,9 @@ unsigned int TestBase::RunSimulation(   std::vector<TensorDesc2>& descriptors,
 {
    unsigned int  retVal= 0;
    //debug prints of glue code input and output.
- 
-   PrintKernelInputParams(&gc_input);
-   PrintKernelOutputParams(&gc_input,&gc_output);    
+
+   // PrintKernelInputParams(&gc_input);
+   // PrintKernelOutputParams(&gc_input,&gc_output);
 
    VPEStats stat;
 
@@ -199,6 +199,6 @@ void TestBase::PrintKernelOutputParams(const tpc_lib_api::HabanaKernelParams* gc
     {
         ss << "\tkernel.scalarParams[" << i << "] = " << gc_output->kernel.scalarParams[i] << std::endl;
     }
-    
+
      std::cout << ss.str();
 }

@@ -4,15 +4,22 @@
 
 import torch
 from custom_searchsorted import CustomSearchSorted
+from custom_reinterpret import CustomReinterpret
 
 def test_custom_searchsorted_op_function():
     print(torch.ops.custom_op.custom_searchsorted)
+    print(torch.ops.custom_op.custom_reinterpret)
     input = torch.tensor([[1.0, 3.0, 5.0, 7.0, 9.0], [2.0, 4.0, 6.0, 8.0, 10.0]], requires_grad=True)
     value = torch.tensor([[3.0, 6.0, 9.0], [3.0, 6.0, 9.0]], requires_grad=True)
-    
+
+    cast_hpu = CustomReinterpret()
+    output_casted = cast_hpu(input)
+    print(output_casted)
+    print("Reinterpret passed?!")
+
     output_cpu = torch.searchsorted(input, value, side='right')
     print(output_cpu)
-    
+
     input_h=input.transpose(0,1).unsqueeze(0)
     value_h=value.transpose(0,1).unsqueeze(0)
 

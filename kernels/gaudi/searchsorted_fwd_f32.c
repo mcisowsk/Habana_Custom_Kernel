@@ -13,6 +13,7 @@ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCL
 OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ********************************************************************/
+#pragma tpc_printf (enable)
 #define bv_cmp_eq_v_v(a, b) from_bool64(v_f32_cmp_eq_b(a, b))
 
 void main(
@@ -22,6 +23,7 @@ void main(
     bool   side
 )
 {
+    printf("Hello from searchsorted\n");
     const int depth  = 0;
     const int width  = 1;
     const int height = 2;
@@ -92,7 +94,7 @@ void main(
                             float64 value = v_f32_ld_tnsr_b(ofmCoords, ifm_val);
                             int64 index = 0;
 
-                            for (int w = widthStart; w < widthEnd; w += widthStep)    
+                            for (int w = widthStart; w < widthEnd; w += widthStep)
                             {
                                 ifmCoords[width] = w;
                                 float64 sequence = v_f32_ld_tnsr_b(ifmCoords, ifm_seq);
@@ -133,7 +135,7 @@ void main(
                             float64 value = v_f32_ld_tnsr_b(ofmCoords, ifm_val);
                             int64 index = 0;
 
-                            for (int w = widthStart; w < widthEnd; w += widthStep)    
+                            for (int w = widthStart; w < widthEnd; w += widthStep)
                             {
                                 ifmCoords[width] = w;
                                 float64 sequence = v_f32_ld_tnsr_b(ifmCoords, ifm_seq);

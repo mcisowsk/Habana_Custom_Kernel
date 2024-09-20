@@ -6,7 +6,7 @@ import torch
 import os
 import habana_frameworks.torch.core
 
-custom_searchsorted_op_lib_path = "./build/lib.linux-x86_64-cpython-38/hpu_custom_searchsorted.cpython-38-x86_64-linux-gnu.so"
+custom_searchsorted_op_lib_path = "./build/lib.linux-x86_64-cpython-310/hpu_custom_searchsorted.cpython-310-x86_64-linux-gnu.so"
 my_dir = os.path.realpath(__file__)
 my_len = my_dir.rfind('/')
 base_dir = my_dir[:my_len]

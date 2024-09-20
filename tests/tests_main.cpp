@@ -16,6 +16,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 
 #include <iostream>
 #include "filter_fwd_2d_bf16_test.hpp"
+// #include "gaudi2_test/reinterpret_fwd_i32_gaudi_test.hpp"
 #include "softmax_bf16_test.hpp"
 #include "softmax_bf16_gaudi2_test.hpp"
 #include "cast_gaudi_test.hpp"
@@ -35,6 +36,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVE
 #include "gather_fwd_i32_test.hpp"
 #include "kl_div_all_test.hpp"
 #include "user_lut_gaudi2_test.hpp"
+#include "reinterpret_fwd_i32_gaudi2_test.hpp"
 
 int check_arg(int argc, char** argv, const char* device, const char* test)
 {
@@ -44,11 +46,11 @@ int check_arg(int argc, char** argv, const char* device, const char* test)
         (argc == 3 && (((strcmp(argv[1], "--test") ==0) || (strcmp(argv[1], "-t") ==0))
         && (strcmp(argv[2], test) ==0))) ||
         (argc == 5 && (((strcmp(argv[1], "--device") ==0) || (strcmp(argv[1], "-d") ==0))
-        && (strcmp(argv[2], device) ==0))  
+        && (strcmp(argv[2], device) ==0))
         && (((strcmp(argv[3], "--test") ==0) || (strcmp(argv[3], "-t") ==0))
         && (strcmp(argv[4], test) ==0))) ||
         (argc == 5 && (((strcmp(argv[3], "--device") ==0) || (strcmp(argv[3], "-d") ==0))
-        && (strcmp(argv[4], device) ==0))  
+        && (strcmp(argv[4], device) ==0))
         && (((strcmp(argv[1], "--test") ==0) || (strcmp(argv[1], "-t") ==0))
         && (strcmp(argv[2], test) ==0))))
         return 1;
@@ -70,7 +72,7 @@ int main(int argc, char** argv)
             "-t | --test  <TestName>    Run <TestName>> only   " << std::endl <<
             "DeviceName:" << std::endl <<
             "Gaudi                      Run all Gaudi kernels only   " << std::endl <<
-            "Gaudi2                     Run all Gaudi2 kernels only   " << std::endl <<            
+            "Gaudi2                     Run all Gaudi2 kernels only   " << std::endl <<
             "TestName:" << std::endl <<
             "FilterFwd2DBF16Test        Run FilterFwd2DBF16Test only   " << std::endl <<
             "SoftMaxBF16Test            Run SoftMaxBF16Test only   " << std::endl <<
@@ -101,11 +103,12 @@ int main(int argc, char** argv)
             "AvgPool2DBwdF32Gaudi2Test  Run AvgPool2DBwdF32Gaudi2Test only   " << std::endl <<
             "CastF16toI16Gaudi2Test     Run CastF16toI16Gaudi2Test only   " << std::endl <<
             "SoftMaxBF16Gaudi2Test      Run SoftMaxBF16Gaudi2Test only   " << std::endl <<
+            "ReinterpretFwdI32Gaudi2Test Run ReinterpretFwdI32Gaudi2Test only   " << std::endl <<
             "UserLutGaudi2Test          Run UserLutGaudi2Test only   " << std::endl;
 
         exit(0);
     }
-    else if(argc == 2) 
+    else if(argc == 2)
     {
         std::cout << "Please use --help or -h for more infomation" << std::endl;
         exit(0);
@@ -124,7 +127,7 @@ int main(int argc, char** argv)
         }
     }
 
-    
+
     if(check_arg(argc, argv, "Gaudi", "SoftMaxBF16Test"))
     {
         SoftMaxBF16Test testSoftMaxBF16;
@@ -444,7 +447,7 @@ int main(int argc, char** argv)
         }
     }
 
-    
+
     if(check_arg(argc, argv, "Gaudi2", "CastF16toI16Gaudi2Test"))
     {
         CastF16toI16Gaudi2Test castf16tpi16Gaudi2ins;
@@ -457,7 +460,20 @@ int main(int argc, char** argv)
             return result;
         }
     }
-    
+
+    if(check_arg(argc, argv, "Gaudi2", "ReinterpretFwdI32Gaudi2Test"))
+    {
+        ReinterpretFwdI32Gaudi2Test reinterpret;
+        reinterpret.SetUp();
+        result = reinterpret.runTest();
+        reinterpret.TearDown();
+        testCount ++;
+        if (result != 0)
+        {
+            return result;
+        }
+    }
+
     if(check_arg(argc, argv, "Gaudi2", "SoftMaxBF16Gaudi2Test"))
     {
         SoftMaxBF16Gaudi2Test testSoftMaxBF16Gaudi2;

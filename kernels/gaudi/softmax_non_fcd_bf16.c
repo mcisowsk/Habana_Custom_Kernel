@@ -14,12 +14,15 @@ OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY TH
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ********************************************************************/
 
+#pragma tpc_printf (enable)
+
 void main(
     tensor ifm,
     tensor ofm
 )
 {
 
+    printf("Hello from softmax\n");
     const int depth  = 0;
     const int width  = 1;
     const int height = 2;

@@ -24,3 +24,14 @@ setup(name='hpu_custom_searchsorted',
                     ],
       cmdclass={'build_ext': cpp_extension.BuildExtension})
 
+setup(name='hpu_custom_reinterpret',
+      ext_modules=[cpp_extension.CppExtension('hpu_custom_reinterpret', ['hpu_custom_reinterpret.cpp'],
+            language='c++', extra_compile_args=["-std=c++17"],
+            libraries=['habana_pytorch_plugin'],
+            library_dirs=[torch_lib_dir])],
+      include_dirs=[torch_include_dir,
+                    habana_modules_directory,
+                    pybind_include_path,
+                    ],
+      cmdclass={'build_ext': cpp_extension.BuildExtension})
+
